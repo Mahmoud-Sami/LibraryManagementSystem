@@ -1,0 +1,107 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Library Books";
+}
+
+<div class="text-center">
+    @if (User?.Identity != null && User.Identity.IsAuthenticated)
+    {
+        var username = User.Identity.Name;
+        <h1>Welcome, @username</h1>
+        <br />
+        @if (Model.ModelState.ContainsKey(string.Empty))
+        {
+            <div class="alert alert-danger">
+                @Model.ModelState[string.Empty].Errors.FirstOrDefault().ErrorMessage
+            </div>
+        }
+        else
+        {
+            <div class="topnav">
+                <div class="input-group">
+                    <input type="text" name="searchText" class="form-control" id="searchTxtBox" placeholder="Search by ISBN, Title, Author ..." value="@Model.TextSearch"/>
+                    <div class="input-group-append">
+                        <button id="searchButton" class="btn btn-primary" type="button" style="margin-left: 10px">Search</button>
+                    </div>
+                </div>
+            </div>
+            <br />
+
+            <form method="post" id="borrowForm">
+                <input type="hidden" id="selectedRowsInput" name="SelectedRows" />
+
+                <table class="table">
+                    <thead style="background-color:#12130d; color: white">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">ISBN</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Author</th>
+                            <th scope="col">Available</th>
+                            <th scope="col">Borrow</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Books.Count; i++)
+                        {
+                            <tr>
+                                <th scope="row">@(i + 1)</th>
+                                <td>@Model.Books[i].ISBN</td>
+                                <td>@Model.Books[i].Title</td>
+                                <td>@Model.Books[i].Author</td>
+                                @if (@Model.Books[i].IsAvailable)
+                                {
+                                    <td><i class="fa fa-check" style="font-size:32px; color:green"></i></td>
+                                    <td><input class="form-check-input" type="checkbox" value="@Model.Books[i].ISBN" name="selectedRows"></td>
+                                }
+                                else
+                                {
+                                    <td> <i class="fa fa-times" style="font-size:32px; color:red"></i></td>
+                                    <td><input class="form-check-input" type="checkbox" value="@Model.Books[i].ISBN" name="selectedRows" disabled></td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-primary" style="margin-top: 10px" onclick="submitBorrowForm()">Borrow Books</button>
+            </form>
+        }
+
+    }
+</div>
+
+<script>
+    function submitBorrowForm() {
+        var selectedRows = document.querySelectorAll('input[name="selectedRows"]:checked');
+        var selectedISBNs = Array.from(selectedRows).map(row => row.value);
+
+        document.getElementById('selectedRowsInput').value = JSON.stringify(selectedISBNs);
+
+        document.getElementById('borrowForm').submit();
+    }
+</script>
+
+<script>
+    var searchTxt = document.getElementById('searchTxtBox');
+    var searchBtn = document.getElementById('searchButton');
+
+    function handleKeyDown(event) {
+        if (event.key === 'Enter') {
+            searchBtn.click();
+        }
+    }
+    searchTxt.addEventListener('keydown', handleKeyDown);
+
+    searchBtn.addEventListener('click', function () {
+        var text = searchTxt.value;
+        if (text.trim() !== '') {
+            window.location.href = 'index?text=' + text;
+        }
+        else
+        {
+            window.location.href = 'index';
+        }
+    });
+</script>
+

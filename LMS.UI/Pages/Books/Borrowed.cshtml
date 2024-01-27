@@ -1,0 +1,61 @@
+﻿@page
+@model LMS.UI.Pages.Books.BorrowedModel
+@{
+}
+
+@if (User?.Identity != null && User.Identity.IsAuthenticated)
+{
+    @if (Model.Borrows.Count > 0)
+    {
+        <form method="post" id="borrowForm">
+            <input type="hidden" id="selectedRowsInput" name="SelectedRows" />
+
+            <table class="table">
+                <thead style="background-color:#12130d; color: white">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">ISBN</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Author</th>
+                        <th scope="col">Borrow Time</th>
+                        <th scope="col">Return</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Borrows.Count; i++)
+                    {
+                        <tr>
+                            <th scope="row">@(i + 1)</th>
+                            <td>@Model.Borrows[i].Book.ISBN</td>
+                            <td>@Model.Borrows[i].Book.Title</td>
+                            <td>@Model.Borrows[i].Book.Author</td>
+                            <td>@Model.Borrows[i].Timestamp</td>
+                            <td><input class="form-check-input" type="checkbox" value="@Model.Borrows[i].Book.ISBN" name="SelectedRows"></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <button type="button" class="btn btn-dark" onclick="submitBorrowForm()">Return</button>
+        </form>
+    }
+    else
+    {
+        <h1>You do not have borrowed books,</h1>
+        <h1>Borrow some books, then come back !</h1>
+
+    }
+}
+
+<script>
+    function submitBorrowForm() {
+        var selectedRows = document.querySelectorAll('input[name="SelectedRows"]:checked');
+        var selectedISBNs = Array.from(selectedRows).map(row => row.value);
+
+        // Set the selected ISBNs in the hidden input field
+        document.getElementById('selectedRowsInput').value = JSON.stringify(selectedISBNs);
+
+        // Submit the form
+        document.getElementById('borrowForm').submit();
+    }
+</script>
