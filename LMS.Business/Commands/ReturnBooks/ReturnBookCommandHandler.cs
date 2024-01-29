@@ -19,7 +19,7 @@ namespace LMS.Business.Commands.ReturnBooks
         public async Task<Result> Handle(ReturnBookCommand request, CancellationToken cancellationToken)
         {
             if (request.BooksISBN is null || request.BooksISBN.Length == 0)
-                return Result.Error("Select books to borrow");
+                return Result.Error("Select books to return");
 
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
