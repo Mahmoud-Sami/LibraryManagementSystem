@@ -52,10 +52,8 @@
         var selectedRows = document.querySelectorAll('input[name="SelectedRows"]:checked');
         var selectedISBNs = Array.from(selectedRows).map(row => row.value);
 
-        // Set the selected ISBNs in the hidden input field
         document.getElementById('selectedRowsInput').value = JSON.stringify(selectedISBNs);
 
-        // Submit the form
         document.getElementById('borrowForm').submit();
     }
 </script>
